@@ -1,0 +1,12 @@
+module_config {
+    module_library : "./examples/component/component1/libcomponent1.so"
+    components {
+        class_name : "Component1"
+        config {
+            name : "data1"
+            readers {
+                channel: "/test/hello0"
+            }
+        }
+    }
+}

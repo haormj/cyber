@@ -1,0 +1,9 @@
+syntax = "proto2";
+
+package apollo.cyber.proto;
+option go_package = "./pb";
+
+message ProtoDesc {
+  optional bytes desc = 1;
+  repeated ProtoDesc dependencies = 2;
+}

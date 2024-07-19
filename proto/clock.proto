@@ -1,0 +1,8 @@
+syntax = "proto2";
+
+package apollo.cyber.proto;
+option go_package = "./pb";
+
+message Clock {
+  required uint64 clock = 1;
+}

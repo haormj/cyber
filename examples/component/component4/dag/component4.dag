@@ -1,0 +1,21 @@
+module_config {
+    module_library : "./examples/component/component4/libcomponent4.so"
+    components {
+        class_name : "Component4"
+        config {
+            name : "data4"
+            readers {
+                channel: "/test/hello0"
+            }
+            readers {
+                channel: "/test/hello1"
+            }        
+            readers {
+                channel: "/test/hello2"
+            }        
+            readers {
+                channel: "/test/hello3"
+            }       
+        }
+    }
+}

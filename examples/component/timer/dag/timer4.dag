@@ -1,0 +1,35 @@
+module_config {
+    module_library : "./examples/component/timer/libmy_timer_component.so"
+    timer_components {
+        class_name : "MyTimerComponent"
+        config {
+            name : "timer0"
+            config_file_path : "./examples/component/timer/conf/config0.pb.txt"
+            interval : 1000
+        }
+    }
+    timer_components {
+        class_name : "MyTimerComponent"
+        config {
+            name : "timer1"
+            config_file_path : "./examples/component/timer/conf/config1.pb.txt"
+            interval : 2000
+        }
+    }
+    timer_components {
+        class_name : "MyTimerComponent"
+        config {
+            name : "timer2"
+            config_file_path : "./examples/component/timer/conf/config2.pb.txt"
+            interval : 4000
+        }
+    }
+    timer_components {
+        class_name : "MyTimerComponent"
+        config {
+            name : "timer3"
+            config_file_path : "./examples/component/timer/conf/config3.pb.txt"
+            interval : 8000
+        }
+    }
+}

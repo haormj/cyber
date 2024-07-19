@@ -1,0 +1,7 @@
+syntax = "proto2";
+
+option go_package = "./pb";
+
+message Config {
+	required string channel_name = 1;
+}

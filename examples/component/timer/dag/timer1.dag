@@ -1,0 +1,11 @@
+module_config {
+    module_library : "./examples/component/timer/libmy_timer_component.so"
+    timer_components {
+        class_name : "MyTimerComponent"
+        config {
+            name : "timer"
+            config_file_path : "./examples/component/timer/conf/config0.pb.txt"
+            interval : 1000
+        }
+    }
+}
