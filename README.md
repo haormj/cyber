@@ -24,7 +24,7 @@ golang version of baidu apollo cyber, this is also under development, not for pr
 2. make
 3. cd examples/component/timer/ && make
 4. cd examples/component/component4 && make
-5. ./output/cyber mainboard -d ./examples/component/timer/dag/timer4.dag -d ./examples/component/component4/dag/component4.dag
+5. ./output/mainboard -d ./examples/component/timer/dag/timer4.dag -d ./examples/component/component4/dag/component4.dag
 
 #### others
 

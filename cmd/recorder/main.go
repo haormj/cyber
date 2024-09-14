@@ -3,7 +3,7 @@ package main
 import (
 	"log"
 
-	"github.com/haormj/cyber/cmd/cyber/cmd"
+	"github.com/haormj/cyber/cmd/recorder/cmd"
 )
 
 func main() {

@@ -1,4 +1,4 @@
-package cmd
+package main
 
 import (
 	"github.com/haormj/cyber/log"
@@ -34,5 +34,10 @@ var mainboardCmd = &cobra.Command{
 
 func init() {
 	mainboardCmd.Flags().StringSliceP("dag_conf", "d", nil, "module dag config file")
-	rootCmd.AddCommand(mainboardCmd)
+}
+
+func main() {
+	if err := mainboardCmd.Execute(); err != nil {
+		log.Logger.Error("mainboardCmd.Execute error", "err", err)
+	}
 }

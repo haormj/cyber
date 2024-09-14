@@ -8,8 +8,8 @@ import (
 )
 
 var rootCmd = &cobra.Command{
-	Use:     "cyber",
-	Short:   "cyber toolkit",
+	Use:     "recorder",
+	Short:   "recorder toolkit",
 	Version: version.FullVersion(),
 }
 
