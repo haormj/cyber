@@ -224,12 +224,21 @@ func (m *MessageIndex) AddTopic(topic *Topic) {
 	m.lock.Lock()
 	defer m.lock.Unlock()
 
+	m.addTopic(topic)
+}
+
+func (m *MessageIndex) addTopic(topic *Topic) {
 	m.topicIndex[topic.Name] = topic
 }
 
 func (m *MessageIndex) GetTopicByName(name string) (*Topic, bool) {
 	m.lock.RLock()
 	defer m.lock.RUnlock()
+
+	return m.getTopicByName(name)
+}
+
+func (m *MessageIndex) getTopicByName(name string) (*Topic, bool) {
 
 	topic, ok := m.topicIndex[name]
 	return topic, ok
@@ -361,13 +370,17 @@ func ListMessagesOrderBy(order messageOrder) ListMessagesOption {
 }
 
 func (m *MessageIndex) ListMessages(opts ...ListMessagesOption) []*Message {
+	m.lock.RLock()
+	defer m.lock.RUnlock()
+
+	return m.listMessages(opts...)
+}
+
+func (m *MessageIndex) listMessages(opts ...ListMessagesOption) []*Message {
 	options := ListMessagesOptions{}
 	for _, o := range opts {
 		o(&options)
 	}
-
-	m.lock.RLock()
-	defer m.lock.RUnlock()
 
 	if m.messageTimeIndex.Len() == 0 {
 		return nil
@@ -554,6 +567,10 @@ func (m *MessageIndex) AddMessage(message *Message) error {
 	m.lock.Lock()
 	defer m.lock.Unlock()
 
+	return m.addMessage(message)
+}
+
+func (m *MessageIndex) addMessage(message *Message) error {
 	if _, ok := m.topicIndex[message.TopicName()]; !ok {
 		return errors.New("topic not exist")
 	}
@@ -561,6 +578,71 @@ func (m *MessageIndex) AddMessage(message *Message) error {
 	m.topicCount[message.TopicName()] = m.topicCount[message.TopicName()] + 1
 	m.messageTimeIndex.ReplaceOrInsert(message)
 	m.messageNameIndex.ReplaceOrInsert(message)
+	return nil
+}
+
+type CopyPair struct {
+	SrcTopicName string
+	DstTopicName string
+}
+
+// Copy src topic 的所有 message 到 dst topic 中
+// 当前实现只有 src topic 存在且 dst topic 不存在才会拷贝
+func (m *MessageIndex) Copy(srcTopicName, dstTopicName string) error {
+	m.lock.Lock()
+	defer m.lock.Unlock()
+
+	return m.copy(srcTopicName, dstTopicName)
+}
+
+// CopyN 拷贝多个 topic
+func (m *MessageIndex) CopyN(pairs ...CopyPair) error {
+	m.lock.Lock()
+	defer m.lock.Unlock()
+
+	for _, pair := range pairs {
+		if err := m.copy(pair.SrcTopicName, pair.DstTopicName); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (m *MessageIndex) copy(srcTopicName, dstTopicName string) error {
+	// 切记下面的实现不要使用有锁的函数
+
+	// src topic 需要存在
+	srcTopic, ok := m.getTopicByName(srcTopicName)
+	if !ok {
+		return nil
+	}
+
+	// dst topic 不存在
+	if _, ok := m.getTopicByName(dstTopicName); ok {
+		return nil
+	}
+
+	dstTopic := &Topic{
+		Name:      dstTopicName,
+		Type:      srcTopic.Type,
+		Files:     srcTopic.Files,
+		ProtoDesc: srcTopic.ProtoDesc,
+	}
+	m.addTopic(dstTopic)
+
+	messages := m.listMessages(ListMessagesWithTopics(srcTopicName))
+	for _, message := range messages {
+		if err := m.addMessage(&Message{
+			id:    GenerateMessageID(),
+			topic: dstTopic,
+			Time:  message.Time,
+			// 目前数据与原数据指向一个地址，当前使用场景下暂时没有深拷贝需求
+			Data: message.Data,
+		}); err != nil {
+			return err
+		}
+	}
 
 	return nil
 }
